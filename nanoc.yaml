@@ -65,8 +65,8 @@ data_sources:
   - type: static
     items_root: /static
   - type: static
-    irems_root: /images
-    prefix: images
+    items_root: /images
+    prefix: images/originals
 
 # Configuration for the “watch” command, which watches a site for changes and
 # recompiles if necessary.

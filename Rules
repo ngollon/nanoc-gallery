@@ -14,6 +14,19 @@
 #   because “*” matches zero or more characters.
 
 ###
+# Preprocess: This creates the gallery structure by associating images with albums
+###
+
+preprocess do
+  images = items.select { |i| i.identifier.start_with?('/images/') }
+  albums = items.select { |i| i[:type] == 'album' }
+  folders = items.select { |i| i[:type] == 'folder' }
+
+  create_gallery_structure(folders, albums, images)
+end
+
+
+###
 # Static items: Don't do anything, just copy to the output directory
 ###
 

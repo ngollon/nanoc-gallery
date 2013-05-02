@@ -1,0 +1,6 @@
+---
+title: Restricted Area
+---
+
+Welcome
+=======
