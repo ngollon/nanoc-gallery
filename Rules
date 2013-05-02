@@ -24,6 +24,17 @@ route '/static/*/' do
   item.identifier.chop.gsub(/^\/static\//,'/')
 end
 
+###
+# Images: Don't do anything, not even copy them. They just provide links for the albums
+###
+
+compile '/images/*/' do
+end
+
+route '/images/*/' do
+  nil
+end
+
 compile '/stylesheet/' do
   # don’t filter or layout
 end
