@@ -1,0 +1,5 @@
+---
+combined: true
+---
+- @items.select{ |i| i.identifier.start_with?('/stylesheets/') }.each do |i|
+  = i.compiled_content

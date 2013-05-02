@@ -48,8 +48,42 @@ route '/images/*/' do
   nil
 end
 
-compile '/stylesheet/' do
-  # don’t filter or layout
+###
+# Stylesheets and scripts in the content folders /stlesheets and /javascript
+# are combined using the style.css and scripts.js files. 
+###
+
+compile '/stylesheets/*/' do
+  filter :sass
+end
+
+compile '/javascript/*/' do
+end
+
+compile '/style/' do
+  filter :haml
+  filter :rainpress
+end
+
+compile '/scripts/' do
+  filter :haml
+  filter :uglify_js
+end
+
+route '/stylesheets/*/' do
+  nil
+end
+
+route '/javascript/*/' do
+  nil
+end
+
+route '/style/' do
+  item.identifier.chop + '.' + item[:extension]
+end
+
+route '/scripts/' do
+  item.identifier.chop + '.' + item[:extension]
 end
 
 compile '*' do
@@ -59,10 +93,6 @@ compile '*' do
     filter :erb
     layout 'default'
   end
-end
-
-route '/stylesheet/' do
-  '/style.css'
 end
 
 route '*' do
