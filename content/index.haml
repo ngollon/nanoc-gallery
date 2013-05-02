@@ -1,0 +1,70 @@
+#login
+  %p#no_javascript
+    JavaScript ist deaktiviert. Diese Gallerie sieht besser aus mit.
+    %a{ :href => '/gallery' } Zur Gallerie 
+
+:javascript
+  login = function(username, password){
+      $.ajax({
+          url: '/gallery/login.token',
+          method: 'GET',
+          beforeSend: function(request) {
+              request.setRequestHeader('Authorization', 'Basic ' + Base64.encode(username + ':' + password));
+          },
+          success: function () {
+          if($('login_remeber').attr('checked')){
+              $.cookie("username", username, { expires: 30 });
+              $.cookie("password", password, { expires: 30 });
+          }
+          window.location='/gallery/'; 
+          },
+          error: function () { $('#error_message').text("E-Mail Addresse oder Passwort waren falsch."); }});
+  }
+            
+  create_login_form = function(){
+  $('<form />')
+      .append($('<p />', { id: 'error_message' }))
+      .append($('<table />')
+          .append($('<tr />')
+              .append($('<td />')
+                  .append('E-Mail Addresse:'))
+              .append($('<td />')
+                  .append($('<input />', { id: 'login_username', type: 'text' }))))
+          .append($('<tr />')
+              .append($('<td />')                
+                  .append('Passwort:'))
+              .append($('<td />')                
+                  .append($('<input />', { id: 'login_password', type: 'password' }))))
+          .append($('<tr />')
+              .append($('<td />'))
+              .append($('<td />')                    
+                  .append($('<input />', { id: 'login_remember', type: 'checkbox' }))
+                  .append('Angemeldet bleiben')))
+          .append($('<tr />')
+              .append($('<td />'))
+              .append($('<td />')    
+                  .append($('<a />', { id: 'login_submit', href: '/gallery', text: 'Anmelden' })))))
+      .appendTo($('#login'));
+  }
+            
+  $(document).ready(function(){
+    // Remove "No JavaScript" warning
+    $('#no_javascript').remove();
+            
+    var username = $.cookie("username");
+    var password = $.cookie("password");
+            
+    if(username != undefined && password != undefined){
+        login(username, password);
+    }else{
+        create_login_form();
+    }
+                                  
+    $('#login_submit').click(function (event) {
+        event.preventDefault();
+        var username = $('#login_username').val();
+        var password = $('#login_password').val();
+        login(username, password);
+        return false;
+    });
+  });

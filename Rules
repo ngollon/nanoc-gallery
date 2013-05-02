@@ -89,12 +89,17 @@ route '/scripts/' do
 end
 
 ###
-# Special layout rules for albums and folders
+# Special layout rules for albums and folders, and the main index
 ###
 
 compile '/gallery/' do
   filter :kramdown, :auto_ids => false
   layout 'folder'
+  layout 'default'
+end
+
+compile '/' do
+  filter :haml
   layout 'default'
 end
 
