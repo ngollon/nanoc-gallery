@@ -13,6 +13,17 @@
 #   item, use the pattern “/about/*/”; “/about/*” will also select the parent,
 #   because “*” matches zero or more characters.
 
+###
+# Static items: Don't do anything, just copy to the output directory
+###
+
+compile '/static/*/' do
+end
+
+route '/static/*/' do
+  item.identifier.chop.gsub(/^\/static\//,'/')
+end
+
 compile '/stylesheet/' do
   # don’t filter or layout
 end

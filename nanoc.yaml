@@ -62,6 +62,9 @@ data_sources:
     # UTF-8 (which they should be!), change this.
     encoding: utf-8
 
+  - type: static
+    items_root: /static
+
 # Configuration for the “watch” command, which watches a site for changes and
 # recompiles if necessary.
 watcher:
