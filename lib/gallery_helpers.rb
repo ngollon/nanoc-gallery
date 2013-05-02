@@ -58,7 +58,8 @@ def get_original_link(image)
 end
 
 def get_image_link(image, type)
-  image.identifier.gsub(/^\/images\//, "/gallery/images/#{type}/").chop + '.' + image[:extension]
+  # Here the extension is alrady present since these come from a static datasource
+  image.identifier.gsub(/^\/images\//, "/gallery/images/#{type}/").chop 
 end
 
 def get_album(image)
@@ -79,5 +80,15 @@ end
 
 def get_child_folders(item)
   @items.select { |i| i.identifier.start_with?(item.identifier) and i.identifier.count('/') == item.identifier.count('/') - 1 and ( i[:type] == 'folder' or i[:type] == 'album' ) } 
+end
+
+def number_of_images(item)
+  if item[:type] == 'album'
+    item[:images].count
+  else
+    sum = 0
+    item.children.each { |album| sum = sum + number_of_images(album) }        
+    sum    
+  end  
 end
 

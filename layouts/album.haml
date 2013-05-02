@@ -1,0 +1,7 @@
+#content= yield
+#gallery
+  - sort_images(@item[:images]).each do |image|
+    %a{ :href => "#{image[:preview]}" }
+      %img{ :src => "#{image[:thumbnail]}" }
+%script
+  $('#gallery').photobox('a', { thumbs:true });

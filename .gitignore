@@ -3,3 +3,6 @@ crash.log
 # Ignore output
 output/
 tmp/
+.sass-cache/
+images/
+content/gallery/

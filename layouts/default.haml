@@ -1,0 +1,23 @@
+%html
+  %head
+    %title #{item[:title]} - #{@config[:site_name]}
+    %link{ :rel => 'stylesheet', :href => '/style.css', :type => 'text/css' }
+    %link{ :rel => 'stylesheet', :href => 'http://fonts.googleapis.com/css?family=Open+Sans:400,600,700', :type => 'text/css' }
+    %link{ :rel => 'stylesheet', :href => 'http://dropthebit.com/demos/photobox/photobox/photobox.css', :type => 'text/css' }
+    %script{ :src => '/scripts.js' }
+  %body
+    #header
+      #title
+        %a{ :href => '/' }= @config[:site_name]
+    #container
+      #navigation      
+        %ul
+          - get_parents(item).each do |parent|
+            %li
+              %a{ :href => relative_path_to(parent) }= parent[:title]    
+          %li.current= item[:title]
+        - if item.identifier != '/'
+          #logoff
+            %a{ :href => '/' } Abmelden    
+      #content
+        = yield

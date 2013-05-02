@@ -1,0 +1,130 @@
+$background-color: #ffffff
+$background-color-header: #0A3B76
+$text-color: #000000
+$text-color-header: #ffffff
+$text-color-faded: gray
+$link-hover-color: #db8600
+
+body
+  margin: 0  
+  padding: 0
+  
+h1,h2,h3,h4,h5,h6
+  color: $background-color-header
+
+a
+  color: $background-color-header
+  &:visited
+    color: $background-color-header
+
+#container
+  width: 90%
+  margin: auto
+
+#header
+  margin: 0
+  background-color: $background-color-header
+  color: $text-color-header
+  padding: 4px 0
+  margin-bottom: 1em
+  #title
+    font-size: x-large
+    width: 90%
+    margin: auto
+    a
+      text-decoration: none
+    a:visited
+      color: $text-color-header
+
+#navigation
+  overflow: hidden
+  width: 100%
+  background: $background-color
+  border-bottom: solid
+  border-bottom-width: 1px
+  border-bottom-color: $background-color-header
+  font-weight: bold
+  margin: 5px 0  
+  color: $background-color-header
+
+  ul
+    margin: 0
+    padding: 0
+
+  li
+    float: left
+    margin: 0 1.5em 0 0
+    a    
+      float: left
+      &:hover
+        &::after
+          color: $text-color
+      &::after
+        content: ">"
+        position: absolute
+        top: 0
+        bottom: 0
+        right: -1em
+    .current, .current:hover
+      &::after
+        content: normal
+  
+  a    
+    position: relative
+    float: right
+    text-decoration: none
+    color: $background-color-header
+    &:visited
+      color: $background-color-header
+    &:hover
+      color: $link-hover-color
+  .current, .current:hover
+    background: none
+    
+
+#content
+  margin-top: 15px
+  
+  .album
+    display: inline-block    
+    
+    h3
+      margin-bottom: 0.2em
+      display: inline
+     
+    .info
+      text-align: right
+      display: inline
+      margin-left: 2px
+      font-size: small
+      font-style: italic
+      color: $text-color-faded
+      
+    .image-crop
+      overflow: hidden	
+      /* remove white-space for inline-block elements */
+      letter-spacing: -0.31em /* webkit */
+      *letter-spacing: normal /* reset IE < 8 */
+      word-spacing: -0.43em /* IE < 8 && gecko */
+      width: 420px    
+      
+      &:before
+        display: inline-block
+        vertical-align: middle
+        content: ""
+        padding-top: 220px /* % of original image width */ 
+      img
+        display: inline-block
+        vertical-align: middle
+        width: 100%
+        padding-left: 100%
+        margin: -999em -100%
+
+#footer
+  margin-top: 40px
+  padding: 4px 0
+  font-size: small
+  font-style: italic
+  color: $text-color-faded
+  text-align: right
+  

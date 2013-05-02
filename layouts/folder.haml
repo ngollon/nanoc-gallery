@@ -1,0 +1,11 @@
+#content= yield
+#gallery
+  - item.children.select { |i| i[:type] == 'album' or i[:type] == 'folder' }.sort_by { |i| i[:sort_order] }.each do |album|
+    .album
+      %h3= album[:title]
+      .info
+        = number_of_images(album).inspect + " Bilder" 
+      .image-crop
+        %a{ :href => "#{relative_path_to(album)}" }
+          %img{ :src => "#{album[:sample][:preview]}" }
+      

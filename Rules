@@ -22,7 +22,7 @@ preprocess do
   albums = items.select { |i| i[:type] == 'album' }
   folders = items.select { |i| i[:type] == 'folder' }
 
-  create_gallery_structure(folders, albums, images)
+  create_gallery_structure(folders, albums, images)  
 end
 
 
@@ -54,7 +54,9 @@ end
 ###
 
 compile '/stylesheets/*/' do
-  filter :sass
+  if item[:extension] == 'sass'
+    filter :sass
+  end
 end
 
 compile '/javascript/*/' do
@@ -67,7 +69,7 @@ end
 
 compile '/scripts/' do
   filter :haml
-  filter :uglify_js
+#  filter :uglify_js  # this does not work on my win8 dev pc, for whatever reason
 end
 
 route '/stylesheets/*/' do
@@ -86,14 +88,31 @@ route '/scripts/' do
   item.identifier.chop + '.' + item[:extension]
 end
 
+###
+# Special layout rules for albums and folders
+###
+
+compile '/gallery/' do
+  filter :kramdown, :auto_ids => false
+  layout 'folder'
+  layout 'default'
+end
+
 compile '*' do
   if item.binary?
     # don’t filter binary items
   else
-    filter :erb
+    filter :kramdown, :auto_ids => false
+    if item[:type] == 'album'
+      layout 'album'
+    elsif item[:type] == 'folder'
+      layout 'folder'
+    end
     layout 'default'
   end
 end
+
+###
 
 route '*' do
   if item.binary?
@@ -105,4 +124,4 @@ route '*' do
   end
 end
 
-layout '*', :erb
+layout '*', :haml
