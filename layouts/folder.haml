@@ -5,7 +5,5 @@
       %h3= album[:title]
       .info
         = number_of_images(album).inspect + " Bilder" 
-      .image-crop
+      .image-crop{ :style => "background-image: url('#{album[:sample][:preview]}');" }
         %a{ :href => "#{relative_path_to(album)}" }
-          %img{ :src => "#{album[:sample][:preview]}" }
-      

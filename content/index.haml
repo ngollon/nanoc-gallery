@@ -12,11 +12,11 @@
               request.setRequestHeader('Authorization', 'Basic ' + Base64.encode(username + ':' + password));
           },
           success: function () {
-          if($('#login_remember').prop('checked')){
-              $.cookie("username", username, { expires: 30 });
-              $.cookie("password", password, { expires: 30 });
-          }
-          window.location='/gallery/'; 
+              if($('#login_remember').prop('checked')){
+                  $.cookie("username", username, { expires: 30 });
+                  $.cookie("password", password, { expires: 30 });
+              }
+              window.location='/gallery/';
           },
           error: function () { $('#error_message').text("E-Mail Addresse oder Passwort waren falsch."); }});
   }
