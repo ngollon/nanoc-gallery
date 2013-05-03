@@ -4,7 +4,7 @@
     %a{ :href => '/gallery' } Zur Gallerie 
 
 :javascript
-  login = function(username, password){
+  try_login = function(username, password){
       $.ajax({
           url: '/gallery/login.token',
           method: 'GET',
@@ -12,7 +12,7 @@
               request.setRequestHeader('Authorization', 'Basic ' + Base64.encode(username + ':' + password));
           },
           success: function () {
-          if($('login_remeber').attr('checked')){
+          if($('#login_remember').prop('checked')){
               $.cookie("username", username, { expires: 30 });
               $.cookie("password", password, { expires: 30 });
           }
@@ -55,7 +55,7 @@
     var password = $.cookie("password");
             
     if(username != undefined && password != undefined){
-        login(username, password);
+        try_login(username, password);
     }else{
         create_login_form();
     }
@@ -64,7 +64,7 @@
         event.preventDefault();
         var username = $('#login_username').val();
         var password = $('#login_password').val();
-        login(username, password);
+        try_login(username, password);
         return false;
     });
   });

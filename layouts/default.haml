@@ -18,6 +18,13 @@
           %li.current= item[:title]
         - if item.identifier != '/'
           #logoff
-            %a{ :href => '/' } Abmelden    
+            %a#logoff_link{ :href => '/' } Abmelden
+            :javascript
+              $(document).ready(function(){
+                $('#logoff_link').click(function(){
+                  $.removeCookie('username', { path: '/' });
+                  $.removeCookie('password', { path: '/' });
+                });
+              });
       #content
         = yield
