@@ -18,7 +18,9 @@
             %li
               %a{ :href => relative_path_to(parent) }= parent[:title]    
           %li.current= item[:title]
-        - if item.identifier != '/'
+        - if item[:type] == 'album'
+          %a#upload_link{ :href => 'upload' } Hochladen
+        - if item.identifier != '/'        
           #logoff
             %a#logoff_link{ :href => '/' } Abmelden
             :javascript

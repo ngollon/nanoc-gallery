@@ -89,7 +89,7 @@ route '/scripts/' do
 end
 
 ###
-# Special layout rules for albums and folders, and the main index
+# Special layout rules the main index
 ###
 
 compile '/gallery/' do
@@ -103,21 +103,48 @@ compile '/' do
   layout 'default'
 end
 
+###
+# Special rules for albums and folders
+###
+
+compile '/gallery/*/*/', :rep => :default do
+  filter :kramdown, :auto_ids => false
+  case item[:type]
+    when 'album'
+      layout 'album'
+    when 'folder'
+      layout 'folder'
+  end
+  layout 'default'
+end
+
+compile '/gallery/*/*/', :rep => :upload do
+  case item[:type]
+    when 'album'
+      layout 'upload'
+  end
+  layout 'default'
+end
+
 compile '*' do
   if item.binary?
     # don’t filter binary items
   else
     filter :kramdown, :auto_ids => false
-    if item[:type] == 'album'
-      layout 'album'
-    elsif item[:type] == 'folder'
-      layout 'folder'
-    end
     layout 'default'
   end
 end
 
 ###
+# Routing rules for albums
+###
+
+route '/gallery/*/*/', :rep => :upload do
+  case item[:type]
+    when 'album'
+      item.identifier + 'upload/index.html'
+  end
+end
 
 route '*' do
   if item.binary?
