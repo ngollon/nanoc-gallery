@@ -22,7 +22,7 @@ preprocess do
   albums = items.select { |i| i[:type] == 'album' }
   folders = items.select { |i| i[:type] == 'folder' }
 
-  create_gallery_structure(folders, albums, images)  
+  create_gallery_structure(folders, albums, images) 
 end
 
 
@@ -89,7 +89,7 @@ route '/scripts/' do
 end
 
 ###
-# Special layout rules the main index
+# Special layout rules for the main index
 ###
 
 compile '/gallery/' do
@@ -107,7 +107,7 @@ end
 # Special rules for albums and folders
 ###
 
-compile '/gallery/*/*/', :rep => :default do
+compile '/gallery/*/', :rep => :default do
   filter :kramdown, :auto_ids => false
   case item[:type]
     when 'album'
@@ -118,12 +118,12 @@ compile '/gallery/*/*/', :rep => :default do
   layout 'default'
 end
 
-compile '/gallery/*/*/', :rep => :upload do
+compile '/gallery/*/', :rep => :upload do
   case item[:type]
     when 'album'
       layout 'upload'
+      layout 'default'
   end
-  layout 'default'
 end
 
 compile '*' do
@@ -139,7 +139,7 @@ end
 # Routing rules for albums
 ###
 
-route '/gallery/*/*/', :rep => :upload do
+route '/gallery/*/', :rep => :upload do
   case item[:type]
     when 'album'
       item.identifier + 'upload/index.html'
