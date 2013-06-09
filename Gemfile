@@ -1,0 +1,6 @@
+gem 'nanoc'
+gem 'haml'
+gem 'exifr'
+gem 'kramdown'
+gem 'sass'
+gem 'rainpress'
