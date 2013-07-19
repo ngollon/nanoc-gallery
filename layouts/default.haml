@@ -1,25 +1,37 @@
 !!! 5
 %html
   %head
-    %meta{ 'http-equiv' => 'X-UA-Compatible', :content => 'IE=edge,chrome=1' }
+    %meta{ charset: 'UTF-8'}
+    %meta{ name: 'viewport', content: 'width=device-width, initial-scale=1.0' }
     %title #{item[:title]} - #{@config[:site_name]}
     %link{ :rel => 'stylesheet', :href => '/style.css', :type => 'text/css' }
     %link{ :rel => 'stylesheet', :href => 'http://fonts.googleapis.com/css?family=Open+Sans:400,600,700', :type => 'text/css' }
     %link{ :rel => 'stylesheet', :href => 'http://dropthebit.com/demos/photobox/photobox/photobox.css', :type => 'text/css' }
+    %link{ :rel => 'stylesheet', :href => '//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap.min.css', :type => 'text/css' }
+    %style{ type: 'text/css' } 
+      @media (min-width: 980px) { body { padding-top: 60px; padding-bottom: 42px; } }
+    %link{ :rel => 'stylesheet', :href => '//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap-responsive.min.css', :type => 'text/css' }
+    %script{ :src => '//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js' }
+    %script{ :src => '//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/js/bootstrap.min.js' }
     %script{ :src => '/scripts.js' }
   %body
-    #header
-      #title
-        %a{ :href => '/' }= @config[:site_name]
-    #container
-      #navigation      
-        %ul
-          - get_parents(item).each do |parent|
-            - if parent.identifier != '/'
-              %li
-                %a{ :href => relative_path_to(parent) }= parent[:title]    
-          %li.current= item[:title]
-        #actions  
+    .navbar.navbar-inverse.navbar-fixed-top
+      .navbar-inner
+        .container
+          %a.brand{ href: '/' } fotos.ameskamp.de
+
+    .container
+      %ul.breadcrumb
+        - get_parents(item).each do |parent|
+          - if parent.identifier != '/'
+            %li
+              %a{ :href => relative_path_to(parent) }= parent[:title]
+              %span.divider /
+        %li.active= item[:title]
+        .pull-right 
+          - if item[:type] == 'album'
+            %a{ :href => 'upload' } Hochladen
+            %span.divider /
           - if item.identifier != '/'       
             %a{ :href => '/' } Abmelden
             :javascript
@@ -29,7 +41,4 @@
                   $.removeCookie('password', { path: '/' });
                 });
               });
-          - if item[:type] == 'album'
-            %a{ :href => 'upload' } Hochladen
-      #content
-        = yield
+      = yield
