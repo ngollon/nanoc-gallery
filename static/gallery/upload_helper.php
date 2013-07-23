@@ -1,104 +1,53 @@
 <?php
-/**
- * upload.php
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
 
-// Make sure file is not cached (as it happens for example on iOS devices)
-header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
-header("Cache-Control: no-store, no-cache, must-revalidate");
-header("Cache-Control: post-check=0, pre-check=0", false);
-header("Pragma: no-cache");
+//
+// To see the PHP example in action, please do the following steps.
+//
+// 1. Open test/js/uploader-demo-jquery.js file and change the request.endpoint
+// parameter to point to this file.
+//
+//  ...
+//  request: {
+//    endpoint: "../server/php/example.php"
+//  }
+//  ...
+//
+// 2. As a next step, make uploads and chunks folders writable.
+//
+// 3. Open test/jquery.html to see if everything is working correctly,
+// the uploaded files should be going into uploads folder.
+//
+// 4. If the upload failed for any reason, please open the JavaScript console,
+// if this does not help please read the excellent documentation we have for you.
+//
+// https://github.com/Widen/fine-uploader/blob/master/readme.md
+//
 
+// Include the uploader class
+require_once 'qqFileUploader.php';
 
-// 5 minutes execution time
-@set_time_limit(5 * 60);
+$uploader = new qqFileUploader();
 
-// Uncomment this one to fake upload time
-// usleep(5000);
+// Specify the list of valid extensions, ex. array("jpeg", "xml", "bmp")
+$uploader->allowedExtensions = array('jpeg', 'jpg');
 
-// Settings
-// $targetDir = ini_get("upload_tmp_dir") . DIRECTORY_SEPARATOR . "plupload";
-$targetDir = '/srv/nanoc-gallery/uploads';
-$cleanupTargetDir = false; // Remove old files
-$maxFileAge = 5 * 3600; // Temp file age in seconds
+// Specify max file size in bytes.
+$uploader->sizeLimit = 20 * 1024 * 1024;
 
-// Create target dir
-if (!file_exists($targetDir)) {
-	@mkdir($targetDir);
-}
+// Specify the input name set in the javascript.
+$uploader->inputName = 'qqfile';
 
-$fileName = isset($_REQUEST["name"]) ? $_REQUEST["name"] : uniqid("file_");
-$filePath = $targetDir . DIRECTORY_SEPARATOR . $fileName;
+// If you want to use resume feature for uploader, specify the folder to save parts.
+$uploader->chunksFolder = 'chunks';
 
-$chunking = isset($_REQUEST["offset"]) && isset($_REQUEST["total"]);
+// Call handleUpload() with the name of the folder, relative to PHP's getcwd()
+$result = $uploader->handleUpload('/srv/nanoc-gallery/uploads');
 
+// To save the upload with a specified name, set the second parameter.
+// $result = $uploader->handleUpload('uploads/', md5(mt_rand()).'_'.$uploader->getName());
 
-// Remove old temp files	
-if ($cleanupTargetDir) {
-	if (!is_dir($targetDir) || !$dir = opendir($targetDir)) {
-		die('{"jsonrpc" : "2.0", "error" : {"code": 100, "message": "Failed to open temp directory."}, "id" : "id"}');
-	}
+// To return a name used for uploaded file you can use the following line.
+$result['uploadName'] = $uploader->getUploadName();
 
-	while (($file = readdir($dir)) !== false) {
-		$tmpfilePath = $targetDir . DIRECTORY_SEPARATOR . $file;
-
-		// If temp file is current file proceed to the next
-		if ($tmpfilePath == "{$filePath}.part") {
-			continue;
-		}
-
-		// Remove temp file if it is older than the max age and is not the current file
-		if (preg_match('/\.part$/', $file) && (filemtime($tmpfilePath) < time() - $maxFileAge)) {
-			@unlink($tmpfilePath);
-		}
-	}
-	closedir($dir);
-}	
-
-
-// Open temp file
-if (!$out = @fopen("{$filePath}.part", $chunking ? "cb" : "wb")) {
-	die('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}'.$filePath."222");
-}
-
-if (!empty($_FILES)) {
-	if ($_FILES['file']['error'] || !is_uploaded_file($_FILES['file']['tmp_name'])) {
-		die('{"jsonrpc" : "2.0", "error" : {"code": 103, "message": "Failed to move uploaded file."}, "id" : "id"}');
-	}
-
-	// Read binary input stream and append it to temp file
-	if (!$in = @fopen($_FILES['file']['tmp_name'], "rb")) {
-		die('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
-	}
-} else {	
-	if (!$in = @fopen("php://input", "rb")) {
-		die('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
-	}
-}
-
-if ($chunking) {
-	fseek($out, $_REQUEST["offset"]); // write at a specific offset
-}
-
-while ($buff = fread($in, 4096)) {
-	fwrite($out, $buff);
-}
-
-@fclose($out);
-@fclose($in);
-
-// Check if file has been uploaded
-if (!$chunking || filesize("{$filePath}.part") >= $_REQUEST["total"]) {
-	// Strip the temp .part suffix off 
-	rename("{$filePath}.part", $filePath);
-}
-
-// Return Success JSON-RPC response
-die('{"jsonrpc" : "2.0", "result" : null, "id" : "id"}');
+header("Content-Type: text/plain");
+echo json_encode($result);

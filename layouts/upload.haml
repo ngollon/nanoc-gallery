@@ -1,60 +1,46 @@
-#uploader
+---
+title: Hochladen 
+---
 
-:javascript
-  function get_url_param( name )
-  {
-    name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+%link{ :rel => 'stylesheet', :href => '//cdnjs.cloudflare.com/ajax/libs/file-uploader/3.1.1/fineuploader.min.css', :type => 'text/css' }   
+%script{ :src => '//cdnjs.cloudflare.com/ajax/libs/file-uploader/3.1.1/jquery.fineuploader.min.js' }
 
-    var regexS = "[\\?&]"+name+"=([^&#]*)";
-    var regex = new RegExp( regexS );
-    var results = regex.exec( window.location.href );
-
-    if ( results == null )
-        return "";
-    else
-        return results[1];
-  }
-
-  // Convert divs to queue widgets when the DOM is ready
-  $(function() {
-    $("#uploader").pluploadQueue({
-        // General settings
-        runtimes : 'html5,flash,silverlight',
-        url : '/gallery/upload_helper.php?album=#{item.identifier}',
-        max_file_size : '20mb',
-        unique_names : true,
-
-        // Specify what files to browse for
-        filters : [
-            {title : "Image files", extensions : "jpg,gif,png"},
-        ],
-
-        // Flash settings
-        flash_swf_url : '/plupload/plupload.flash.swf',
-
-        // Silverlight settings
-        silverlight_xap_url : '/plupload/plupload.silverlight.xap'
-    });
-
-    // Client side form validation
-    $('form').submit(function(e) {
-        var uploader = $('#uploader').pluploadQueue();
-
-        // Files in queue upload them first
-        if (uploader.files.length > 0) {
-            // When all files are uploaded submit form
-            uploader.bind('StateChanged', function() {
-                if (uploader.files.length === (uploader.total.uploaded + uploader.total.failed)) {
-                    $('form')[0].submit();
-                }
-            });
-                
-            uploader.start();
-        } else {
-            alert('You must queue at least one file.');
-        }
-
-        return false;
-    });
-  });
- 
+.row
+  .span12
+    #uploader
+    :javascript
+      function get_album_id()
+      {
+        var regex = /\/gallery\/(.*)\/upload\/$/;
+        var results = regex.exec( window.location.href );
+    
+        if ( results == null )
+          return "";
+        else
+          return results[1];
+      }
+    
+      $(document).ready(function() {
+        $('#uploader').fineUploader({
+          request: {
+            endpoint: '/gallery/upload_helper.php',
+            params: {
+              album: get_album_id()
+            }
+          },
+          validation: {
+            allowedExtensions: ['jpeg', 'jpg'],
+            sizeLimit: 20971520, // 20 MiB
+          },
+          text : {
+            uploadButton: 'Bilder hochladen',
+          },
+          failedUploadTextDisplay: {
+            mode: 'custom',
+            maxChars: 40,
+            responseProperty: 'error',
+            enableTooltip: true
+          }
+        });
+      });
+      
