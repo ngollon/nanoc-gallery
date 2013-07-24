@@ -1,4 +1,5 @@
 site_name: 'nanoc-gallery'
+image_directory: '/srv/nanoc-gallery/images/originals'
 
 # A list of file extensions that nanoc will consider to be textual rather than
 # binary. If an item with an extension not in this list is found,  the file
@@ -29,7 +30,7 @@ prune:
   # Which files and directories you want to exclude from pruning. If you version
   # your output directory, you should probably exclude VCS directories such as
   # .git, .svn etc.
-  exclude: [ '.git', '.hg', '.svn', 'CVS', 'images' ]
+  exclude: [ '.git', '.hg', '.svn', 'CVS' ]
 
 # The data sources where nanoc loads its data from. This is an array of
 # hashes; each array element represents a single data source. By default,
@@ -66,9 +67,6 @@ data_sources:
 
   - type: static
     items_root: /static
-  - type: static
-    items_root: /images
-    prefix: images/originals
 
 # Configuration for the “watch” command, which watches a site for changes and
 # recompiles if necessary.

@@ -1,27 +1,18 @@
-# image identifiers are of the format /images/<album_1>/<subalbum_1>/<image_name>/
 # album identifier would be /gallery/<album_1>/<subalbum_1>/
 # folder identifier /gallery/<album_1>/
+require 'pp'
 
-require 'exifr'
-
-def create_gallery_structure(folders, albums, images)
-  images.each {|image| set_image_attributes(image) }
-
-  add_images_to_albums(images, albums)
+def create_gallery_structure(folders, albums)
+  albums.each { |a|  add_images_to_album(a) }
   add_albums_to_folders(albums, folders)
 end
 
 
-def add_images_to_albums(images, albums)
-  groups = images.group_by { |i| i[:album] }
-  groups.each do |album_id, album_images|
-    if not albums.one? { |a| a.identifier == album_id }
-      raise(ArgumentError, "None or multiple albums with id #{album_id} found.")
-    end
-    album = albums.select { |a| a.identifier == album_id }.first
-    album[:images] = album_images
-    album[:sample] = album_images.sample
-  end
+def add_images_to_album(album)
+  album_images = album[:images].each { |i| add_image_properties(album, i) }
+
+  album[:images] = album_images
+  album[:sample] = album_images.sample
 end
 
 def add_albums_to_folders(albums, folders)
@@ -36,30 +27,26 @@ def add_albums_to_folders(albums, folders)
   end
 end
 
-def set_image_attributes(item)
-  item[:type] = 'image'
-  item[:original] = get_original_link(item)
-  item[:preview] = get_preview_link(item)
-  item[:thumbnail] = get_thumbnail_link(item)
-  item[:album] = get_album(item)
-  item[:created] = EXIFR::JPEG.new(item.raw_filename).date_time 
+def add_image_properties(album, image)
+  image[:original] = get_original_link(album, image[:id])
+  image[:preview] = get_preview_link(album, image[:id])
+  image[:thumbnail] = get_thumbnail_link(album, image[:id])
 end
 
-def get_thumbnail_link(image)  
-  get_image_link(image, 'thumbnails')
+def get_thumbnail_link(album, id)  
+  get_image_link(album, id, 'thumbnails')
 end
 
-def get_preview_link(image)  
-  get_image_link(image, 'previews')
+def get_preview_link(album, id)  
+  get_image_link(album, id, 'previews')
 end
 
-def get_original_link(image)  
-  get_image_link(image, 'originals')
+def get_original_link(album, id)  
+  get_image_link(album, id, 'originals')
 end
 
-def get_image_link(image, type)
-  # Here the extension is alrady present since these come from a static datasource
-  image.identifier.gsub(/^\/images\//, "/gallery/images/#{type}/").chop 
+def get_image_link(album, id, type)
+  "/gallery/images/#{type}/#{album.identifier.gsub(/^\/gallery\//, '')}#{id}"
 end
 
 def get_album(image)
@@ -67,7 +54,7 @@ def get_album(image)
 end
 
 def sort_images(images)
-  images.sort_by { |i| i[:created].to_i }
+  images.sort_by { |i| i[:date].to_i }
 end
 
 def get_parents(item)
@@ -80,6 +67,15 @@ end
 
 def get_child_folders(item)
   @items.select { |i| i.identifier.start_with?(item.identifier) and i.identifier.count('/') == item.identifier.count('/') - 1 and ( i[:type] == 'folder' or i[:type] == 'album' ) } 
+end
+
+def number_of_images_formatted(item)
+  number = number_of_images(item)
+  if(number == 1)
+    "1 Bild"
+  else
+    "#{number} Bilder"
+  end
 end
 
 def number_of_images(item)

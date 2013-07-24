@@ -18,11 +18,10 @@
 ###
 
 preprocess do
-  images = items.select { |i| i.identifier.start_with?('/images/') }
   albums = items.select { |i| i[:type] == 'album' }
   folders = items.select { |i| i[:type] == 'folder' }
 
-  create_gallery_structure(folders, albums, images) 
+  create_gallery_structure(folders, albums) 
 end
 
 
@@ -35,17 +34,6 @@ end
 
 route '/static/*/' do
   item.identifier.chop.gsub(/^\/static\//,'/')
-end
-
-###
-# Images: Don't do anything, not even copy them. They just provide links for the albums
-###
-
-compile '/images/*/' do
-end
-
-route '/images/*/' do
-  nil
 end
 
 ###
