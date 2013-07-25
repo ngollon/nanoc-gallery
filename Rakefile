@@ -1,30 +1,28 @@
 require 'yaml'
 require 'pp'
 require 'exifr'
+require 'colorize'
+require 'fileutils'
 
-def load_config
-  YAML.load_file('/srv/nanoc-gallery/nanoc.yaml')
-end
+@config = YAML.load_file('/srv/nanoc-gallery/nanoc.yaml')
 
 desc "Shows current site config"
 task :show_config do
-  pp load_config()
+  pp @config
 end
 
 desc "Updates an album to contain the image links"
-task :update, [:id] do |t, args| 
+task :update_album, [:id] do |t, args| 
   id = args[:id]
-  config = load_config() 
-  image_directory = config['image_directory']
+  image_directory = @config['image_directory']
   abort "image_directory not defined in nanoc.yaml" if image_directory.nil?
   
   update(image_directory, id)
 end
 
 desc "Updates all albums and folders"
-task :update_all do
-  config = load_config()
-  image_directory = config['image_directory']
+task :update_all_albums do
+  image_directory = @config['image_directory']
 
   update(image_directory, '/' )
 
@@ -33,6 +31,25 @@ task :update_all do
     l2 = dir.length - l1
     id = dir[l1, l2]
     update(image_directory, id) 
+  end
+end
+
+desc "Create thumbnail and preview image"
+task :cache_image, [:image] do |t,args|
+  image = File.expand_path(args[:image])
+
+  abort "File not found #{image}" unless File.exists?(image)
+
+  create_preview(image)
+  create_thumbnail(image)
+end
+
+desc "Create thumbnails and previews for all images"
+task :cache_all_images do
+  images = Dir[@config['image_directory'] + '/**/*'].reject {|fn| File.directory?(fn) }
+  images.each do |i|
+    create_thumbnail(i)
+    create_preview(i)
   end
 end
 
@@ -57,6 +74,8 @@ def update_album(album_directory, index_file)
   index = YAML.load_file(index_file)
   index['images'] = [] if index['images'].nil?
  
+  old_count = index['images'].count
+
   existing_images = get_images(album_directory)
 
   index['images'].reject! { |i| existing_images.index { |ei| ei['id'] == i['id'] }.nil? } 
@@ -69,6 +88,8 @@ def update_album(album_directory, index_file)
   File.open(index_file, 'w+') do |out|
     YAML.dump(index, out)
   end
+  total = index['images'].count
+  puts "Updated album #{album_directory}. Total: #{total}. New: #{total - old_count}" 
 end
 
 def update_folder(folder_directory, index_file)
@@ -97,7 +118,7 @@ end
 
 
 def get_images(directory)
-  Dir.glob(directory + '/*.jpg').collect { |i| { 'id' => File.basename(i), 'date' => nil } }
+  Dir.glob(directory + '/*.jpg', File::FNM_CASEFOLD).collect { |i| { 'id' => File.basename(i), 'date' => nil } }
 end
 
 def get_subdirectories(directory)
@@ -105,5 +126,50 @@ def get_subdirectories(directory)
 end
 
 def get_date(image)
-  EXIFR::JPEG.new(image).date_time.inspect  
+  date = EXIFR::JPEG.new(image).date_time.inspect
+  if date.nil?
+    date = File.mtime(image).inspect
+  end
+end
+
+def get_directory(path)
+    path.gsub(/[^\/]*$/, '')
+end
+
+def convert_and_crop(original, target, size)
+  call = "convert -auto-orient -resize #{size.inspect} -gravity Center -crop #{(size+"+0+0").inspect} +repage #{original.inspect} #{target.inspect}"
+  system(call)
+end
+
+def convert(original, target, size)
+  call = "convert -auto-orient -resize #{size.inspect} #{original.inspect} #{target.inspect}"
+  system(call)
+end
+
+def create(image, directory, size, mode)
+  cache = File.join(@config['cache_directory'], directory)
+  target = image.gsub(/^#{Regexp.escape(@config['image_directory'])}/, "#{cache}")
+  dirname = File.dirname(target)
+  if not Dir.exists?(dirname)
+    puts "Creating #{dirname}".green
+    FileUtils.mkdir_p(dirname)
+  end
+  if File.exists?(target) 
+    puts "Skipping #{target}".yellow
+  else
+    puts "Creating #{target}".green
+    if mode == :crop
+      convert_and_crop(image, target, size)
+    else
+      convert(image, target, size)
+    end    
+  end
+end
+
+def create_thumbnail(image)
+  create(image, 'thumbnails', '160x160^', :crop)
+end
+
+def create_preview(image)
+  create(image, 'previews', '800x800>', :default)
 end
