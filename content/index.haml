@@ -1,39 +1,72 @@
-.well
-  %ul.nav.nav-tabs{ :data => { :tabs => 'tabs' } }
-    %li.active
-      %a{ :href => '#login', :data => { :toggle => 'tab'} } Einloggen
-    %li
-      %a{ :href => '#create', :data => { :toggle => 'tab'} } Registrieren
-  .tab-content
-    #login.tab-pane.active.in
-      %form.form-horizontal{ :method => 'POST' }
-        %fieldset
-          .legend
-            %legend Einloggen
-          .control-group
-            %label.control-label{ :for => 'email' } E-Mail Adresse
-            .controls
-              %input#email.input-xlarge{ :name => 'email', :type => 'text'}
-          .control-group
-            %label.control-label{ :for => 'password' } Passwort
-            .controls
-              %input#password.input-xlarge{ :name => 'password', :type => 'password'}
-          .control-group
-            .controls
-              %button.btn.btn-success Einloggen
-    #create.tab-pane.fade
-      %form.form-horizontal{ :method => 'POST' }
-        %fieldset
-          .legend
-            %legend Registrieren
-          .control-group
-            %label.control-label{ :for  => 'email' } E-Mail Adresse
-            .controls
-              %input#email.input-xlarge{ :name => 'email', :type => 'text'}
-          .control-group
-            %label.control-label{ :for => 'password' } Passwort
-            .controls
-              %input#password.input-xlarge{ :name => 'password', :type => 'password'}
-          .control-group
-            .controls
-              %button.btn.btn-success Registrieren 
+%ul.nav.nav-tabs{ :data => { :tabs => 'tabs' } }
+  %li.active
+    %a{ :href => '#login', :data => { :toggle => 'tab'} } Einloggen
+  %li
+    %a{ :href => '#create', :data => { :toggle => 'tab'} } Registrieren
+.tab-content
+  #login.tab-pane.active.in
+    #login_message.alert.alert-error.hidden
+    %form#login_form.form-horizontal{ :action => '/login.php', :method => 'POST' }
+      %fieldset
+        .legend
+          %legend Einloggen
+        .control-group
+          %label.control-label{ :for => 'email' } E-Mail Adresse
+          .controls
+            %input#email.input-xlarge{ :name => 'email', :type => 'text'}
+        .control-group
+          %label.control-label{ :for => 'password' } Passwort
+          .controls
+            %input#password.input-xlarge{ :name => 'password', :type => 'password'}
+        .control-group
+          .controls
+            %button.btn.btn-success Einloggen
+  #create.tab-pane.fade
+    #create_message.alert.hidden            
+    %form#create_form.form-horizontal{ :action => '/register.php', :method => 'POST' }
+      %fieldset
+        .legend
+          %legend Registrieren
+        .control-group
+          %label.control-label{ :for  => 'email' } E-Mail Adresse
+          .controls
+            %input#email.input-xlarge{ :name => 'email', :type => 'text'}
+        .control-group
+          %label.control-label{ :for => 'password' } Passwort
+          .controls
+            %input#password.input-xlarge{ :name => 'password', :type => 'password'}
+        .control-group
+          .controls
+            %button.btn.btn-success Registrieren 
+:javascript
+  $(document).ready(function(){
+    $("#login_form").submit(function(event){
+      event.preventDefault();
+      $.post('/login.php', $("#login_form").serialize(), function(json) {
+          if(json.success){
+            window.location = '/gallery/';
+          }
+          else{
+            $('#login_message').removeClass('hidden');
+            $('#login_message').text(json.message);
+          }
+      }, 'json');
+      return false;
+    });
+    $("#create_form").submit(function(event){
+      event.preventDefault();
+      $.post('/register.php', $("#create_form").serialize(), function(json) {
+          if(json.success){
+            $('#create_message').removeClass('hidden');
+            $('#create_message').addClass('alert-success');
+            $('#create_message').text(json.message);
+          }
+          else{
+            $('#create_message').removeClass('hidden');
+            $('#create_message').addClass('alert-error');
+            $('#create_message').text(json.message);
+          }
+      }, 'json');
+      return false;
+    });
+  });

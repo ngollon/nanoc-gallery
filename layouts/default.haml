@@ -33,7 +33,7 @@
             %a{ :href => 'upload' } Hochladen
             %span.divider /
           - if item.identifier != '/'       
-            %a{ :href => '/' } Abmelden
+            %a{ :href => '/logoff.php' } Abmelden
             :javascript
               $(document).ready(function(){
                 $('#logoff_link').click(function(){

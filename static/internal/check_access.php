@@ -12,9 +12,9 @@
 
   $result = array();
  
-  if(false &&(   !isset($_SESSION['email'])
+  if(   !isset($_SESSION['email'])
      || !isset($_SESSION['password'])
-     || !try_login($_SESSION['email'], $_SESSION['password'])))
+     || !try_login($_SESSION['email'], $_SESSION['password']))
   {
     header('Location: /index.html?target=' . $q);
   }

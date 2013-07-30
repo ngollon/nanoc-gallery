@@ -1,24 +1,36 @@
 <?php
   session_start();
+  header('Content-Type: application/json');
   
   $result = array();
-  $result['target'] = '/gallery';  
   
-  if(try_login($email, $password)
+  if(!isset($_POST['email']) || !isset($_POST['password']))
+  {
+    $result['success'] = false;
+    $result['message'] = 'Das Login Script sollte durch das korrekte Formular aufgerufen werden.';
+    echo json_encode($result);
+    return;
+  }
+
+  $email = $_POST['email'];
+  $password = $_POST['password'];
+  
+  if(try_login($email, $password))
   {
     $_SESSION['email'] = $email;
     $_SESSION['password'] = $password;
     
-    $result['result'] = 'success';    
+    $result['success'] = true;
+    $result['message'] = 'Wenn Du dies siehst, hast Du Javascript nicht aktiviert.';    
   }
   else
   {
-    $result['result'] = 'E-Mail Adresse oder Passwort sind unbekannt.'
-    session_destory();
+    $result['success'] = false;
+    $result['message'] = 'E-Mail Adresse oder Passwort sind unbekannt.';
+    session_destroy();
   }
-  
-  
-  return json_encode($result);
+    
+  echo json_encode($result);
   
   function try_login($user, $password)
   {
