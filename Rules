@@ -114,23 +114,37 @@ compile '/gallery/*/', :rep => :upload do
   end
 end
 
+###
+# Routing gallery to internal folder
+###
+
+route '/gallery/' do
+  rewrite(item.identifier) + 'index.html'
+end
+
+route '/gallery/*/' do
+  if item.binary?
+    # Write item with identifier /foo/ to /foo.ext
+    rewrite(item.identifier).chop + '.' + item[:extension]
+  else
+    # Write item with identifier /foo/ to /foo/index.html
+    rewrite(item.identifier) + 'index.html'
+  end
+end
+
+route '/gallery/*/', :rep => :upload do
+  case item[:type]
+    when 'album'
+      rewrite(item.identifier) + 'upload/index.html'
+  end
+end
+
 compile '*' do
   if item.binary?
     # don’t filter binary items
   else
     filter :kramdown, :auto_ids => false
     layout 'default'
-  end
-end
-
-###
-# Routing rules for albums
-###
-
-route '/gallery/*/', :rep => :upload do
-  case item[:type]
-    when 'album'
-      item.identifier + 'upload/index.html'
   end
 end
 
