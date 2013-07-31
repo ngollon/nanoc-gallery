@@ -1,7 +1,7 @@
 .row
-  .span12= yield
+  .col-lg-12= yield
 .row
-  .span12
+  .col-lg-12
     #gallery
       - item.children.select { |i| i[:type] == 'album' or i[:type] == 'folder' }.sort_by { |i| i[:sort_order] }.each do |album|
         .album

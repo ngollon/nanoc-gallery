@@ -8,7 +8,7 @@ else
 
 if(!isset($_SESSION['email']) || !isset($_SESSION['password']) || !try_login($_SESSION['email'], $_SESSION['password']))
 {
-    header('HTTP/1.0 403 Forbidden');
+    header('Location: /');
 }
 else
 {

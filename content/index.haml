@@ -1,45 +1,56 @@
-%ul.nav.nav-tabs{ :data => { :tabs => 'tabs' } }
+%ul.breadcrumb{ :data => { :tabs => 'tabs' } }
   %li.active
     %a{ :href => '#login', :data => { :toggle => 'tab'} } Einloggen
   %li
     %a{ :href => '#create', :data => { :toggle => 'tab'} } Registrieren
 .tab-content
   #login.tab-pane.active.in
-    #login_message.alert.alert-error.hidden
+    #login_message.alert.alert-danger.hidden
     %form#login_form.form-horizontal{ :action => '/login.php', :method => 'POST' }
-      %fieldset
-        .legend
-          %legend Einloggen
-        .control-group
-          %label.control-label{ :for => 'email' } E-Mail Adresse
-          .controls
-            %input#email.input-xlarge{ :name => 'email', :type => 'text'}
-        .control-group
-          %label.control-label{ :for => 'password' } Passwort
-          .controls
-            %input#password.input-xlarge{ :name => 'password', :type => 'password'}
-        .control-group
-          .controls
-            %button.btn.btn-success Einloggen
+      .legend
+        %legend Einloggen
+      .form-group
+        %label.col-lg-2.control-label{ :for => 'email' } E-Mail Adresse
+        .col-lg-10
+          %input.form-control{ :name => 'email', :type => 'text', :placeholder => 'E-Mail Adresse'}
+      .form-group
+        %label.col-lg-2.control-label{ :for => 'password' } Passwort
+        .col-lg-10
+          %input.form-control{ :name => 'password', :type => 'password', :placeholder => 'Passwort' }
+      .form-group
+        .col-lg-2
+        .col-lg-10
+          %button.btn.btn-success{ :type => 'submit' } Einloggen
+          %button#recover.btn.btn-link Passwort vergessen
   #create.tab-pane.fade
     #create_message.alert.hidden            
     %form#create_form.form-horizontal{ :action => '/register.php', :method => 'POST' }
-      %fieldset
-        .legend
-          %legend Registrieren
-        .control-group
-          %label.control-label{ :for  => 'email' } E-Mail Adresse
-          .controls
-            %input#email.input-xlarge{ :name => 'email', :type => 'text'}
-        .control-group
-          %label.control-label{ :for => 'password' } Passwort
-          .controls
-            %input#password.input-xlarge{ :name => 'password', :type => 'password'}
-        .control-group
-          .controls
-            %button.btn.btn-success Registrieren 
+      .legend
+        %legend Registrieren
+      .form-group
+        %label.col-lg-2.control-label{ :for => 'email' } E-Mail Adresse
+        .col-lg-10
+          %input.form-control{ :name => 'email', :type => 'text', :placeholder => 'E-Mail Adresse'}
+      .form-group
+        %label.col-lg-2.control-label{ :for => 'password' } Passwort
+        .col-lg-10
+          %input.form-control{ :name => 'password', :type => 'password', :placeholder => 'Passwort' }
+      .form-group
+        .col-lg-2
+        .col-lg-10
+          %button.btn.btn-success{ :type => 'submit' } Registrieren
 :javascript
   $(document).ready(function(){
+    $.get('/gallery/', function(data){
+       if(data.indexOf('#login') == -1)
+         window.location = '/gallery/'; 
+    });
+
+    $("#recover").click(function(event){
+      event.preventDefault();
+      alert("Pech gehabt");
+      return false;
+    });
     $("#login_form").submit(function(event){
       event.preventDefault();
       $.post('/login.php', $("#login_form").serialize(), function(json) {
@@ -58,12 +69,14 @@
       $.post('/register.php', $("#create_form").serialize(), function(json) {
           if(json.success){
             $('#create_message').removeClass('hidden');
+            $('#create_message').removeClass('alert-danger');
             $('#create_message').addClass('alert-success');
             $('#create_message').text(json.message);
           }
           else{
             $('#create_message').removeClass('hidden');
-            $('#create_message').addClass('alert-error');
+            $('#create_message').removeClass('alert-success');
+            $('#create_message').addClass('alert-danger');
             $('#create_message').text(json.message);
           }
       }, 'json');
