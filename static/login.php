@@ -18,9 +18,18 @@ if(!file_exists($file))
 $data = json_decode(file_get_contents($file));
 if(!$data->active)
     failure('Dieser Benutzer ist noch nicht freigeschaltet. Wenn Du denkst, wir haben Dich vergessen, ruf einfach an.');
-    
+
+
 if(crypt($password, $data->password) != $data->password)
-    failure('Das Passwort ist nicht korrekt.');
+{
+    if(isset($data->reset_password) && crypt($password, $data->reset_password) == $data->reset_password) {
+        $data->password = $data->reset_password;
+        unset($data->reset_password);
+        file_put_contents($file, json_encode($data));
+    } else {
+        failure('Das Passwort ist nicht korrekt.');
+    }
+}
     
 $_SESSION['email'] = $email;
 $_SESSION['password'] = $password;

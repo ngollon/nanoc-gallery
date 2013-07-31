@@ -48,7 +48,17 @@
 
     $("#recover").click(function(event){
       event.preventDefault();
-      alert("Pech gehabt");
+      $.post('/reset.php', $("#login_form").serialize(), function(json) {
+          if(json.success){
+            $('#login_message').removeClass('hidden alert-danger');
+            $('#login_message').text(json.message);
+          }
+          else{
+            $('#login_message').removeClass('hidden');
+            $('#login_message').addClass('alert-danger');
+            $('#login_message').text(json.message);
+          }
+      }, 'json');
       return false;
     });
     $("#login_form").submit(function(event){
@@ -59,6 +69,7 @@
           }
           else{
             $('#login_message').removeClass('hidden');
+            $('#login_message').addClass('alert-danger');
             $('#login_message').text(json.message);
           }
       }, 'json');

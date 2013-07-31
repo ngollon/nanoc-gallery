@@ -30,5 +30,59 @@
               %a{ :href => 'upload' } Hochladen
               %span.text-muted /
             - if item.identifier != '/'       
+              %a{ :href => '#change_box', :data => { :toggle => 'modal' } } Passwort ändern
+              %span.text-muted /
               %a{ :href => '/logoff.php' } Abmelden
+      #change_box.modal.fade
+        .modal-dialog
+          .modal-content
+            %form#change_password_form.modal-form.form-horizontal
+              .modal-header
+                %button.close{ :type => 'button', :data => { :dismiss => 'modal' }, :aria => { :hidden => 'true' } } &times;
+                %h4.modal-title Passwort ändern
+              .modal-body
+                #change_message.alert.hidden
+                .form-group
+                  %label.col-lg-4.control-label{ :for => 'old_password' } Altes Passwort
+                  .col-lg-8
+                    %input.form-control{ :name => 'old_password', :type => 'password', :placeholder => 'Altes Passwort'}
+                .form-group
+                  %label.col-lg-4.control-label{ :for => 'new_password' } Neues Passwort
+                  .col-lg-8
+                    %input.form-control{ :name => 'new_password', :type => 'password', :placeholder => 'Neues Passwort' }
+              .modal-footer
+                %button#change_password.btn.btn-success{ :type => 'submit' } Passwort ändern
+      :javascript
+        $(document).ready(function(){
+          $('#change_password').click(function(event){
+             event.preventDefault;
+             $.post('/change_password.php', $("#change_password_form").serialize(), function(json) {
+               if(json.success){
+                 $('#change_message').addClass('alert-success');                
+                 $('#change_message').removeClass('hidden alert-danger');
+                 $('#change_message').text(json.message);
+                 $('#change_box .form-group').addClass('hidden');
+                 $('#change_box .modal-header').addClass('hidden');
+                 $('#change_box .modal-footer').addClass('hidden');
+                 setTimeout(reset_box, 2000);
+               }
+               else{
+                 $('#change_message').removeClass('hidden alert-success');
+                 $('#change_message').addClass('alert-danger');                
+                 $('#change_message').text(json.message);
+               }
+               $('#change_password_form').each(function(){ this.reset(); });
+             }, 'json');
+
+             return false;
+           });
+        });        
+
+        function reset_box(){
+            $('#change_box').modal('hide');                 
+            $('#change_message').addClass('hidden');
+            $('#change_box .form-group').removeClass('hidden');
+            $('#change_box .modal-header').removeClass('hidden');
+            $('#change_box .modal-footer').removeClass('hidden');
+        }
       = yield
