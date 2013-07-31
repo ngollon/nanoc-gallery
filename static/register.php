@@ -31,7 +31,7 @@ $data['email'] = $email;
 $data['password'] = crypt($password);
 file_put_contents($file, json_encode($data));
 
-success('Registration erfolgreich. Wir werden Dich so bald wie möglich freischalten und Dir dann eine E-Mail schicken.');
+success('Registrierung erfolgreich. Wir werden Dich so bald wie möglich freischalten und Dir dann eine E-Mail schicken.');
 
 
 function success($message){
