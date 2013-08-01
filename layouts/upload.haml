@@ -2,45 +2,61 @@
 title: Hochladen 
 ---
 
-%link{ :rel => 'stylesheet', :href => '//cdnjs.cloudflare.com/ajax/libs/file-uploader/3.1.1/fineuploader.min.css', :type => 'text/css' }   
-%script{ :src => '//cdnjs.cloudflare.com/ajax/libs/file-uploader/3.1.1/jquery.fineuploader.min.js' }
+%link{ :rel => 'stylesheet', :href => '//cdnjs.cloudflare.com/ajax/libs/file-uploader/3.7.0/fineuploader.min.css', :type => 'text/css' }   
+%script{ :src => '//cdnjs.cloudflare.com/ajax/libs/file-uploader/3.7.0/fineuploader-jquery.min.js' }
 
-.row
-  .span12
-    #uploader
-    :javascript
-      function get_album_id()
-      {
-        var regex = /\/gallery\/(.*)\/upload\/$/;
-        var results = regex.exec( window.location.href );
-    
-        if ( results == null )
-          return "";
-        else
-          return results[1];
-      }
-    
-      $(document).ready(function() {
-        $('#uploader').fineUploader({
-          request: {
-            endpoint: '/gallery/upload_helper.php',
-            params: {
-              album: get_album_id()
-            }
-          },
-          validation: {
-            allowedExtensions: ['jpeg', 'jpg'],
-            sizeLimit: 20971520, // 20 MiB
-          },
-          text : {
-            uploadButton: 'Bilder hochladen',
-          },
-          failedUploadTextDisplay: {
-            mode: 'custom',
-            maxChars: 40,
-            responseProperty: 'error',
-            enableTooltip: true
-          }
-        });
-      });
+#uploader.row
+:javascript
+  $(document).ready(function() {
+    $('#uploader').fineUploader({
+      request: {
+         endpoint: '/upload_helper.php',
+         forceMultipart: true,
+         params: {
+           album: '#{item.identifier.gsub(/^\/gallery\//,'')}'
+           }
+         },
+         validation: {
+           allowedExtensions: ['jpg'],
+           sizeLimit: 20971520, // 20 MiB
+         },
+         template: '<div class="col-lg-2">' +
+                   '<div class="qq-upload-drop-area"><span>{dragZoneText}</span></div>' +
+                   '<button class="qqc-upload-button btn btn-success">{uploadButtonText}</button>' +
+                   '<span class="qq-drop-processing"><span>{dropProcessingText}</span><span class="qq-drop-processing-spinner"></span></span>' +
+                 '</div>' +
+                 '<div class="col-lg-10">' +
+                   '<ul class="qqc-upload-list list-unstyled"></ul>' +
+                 '</div>',
+         fileTemplate: '<li>' +
+                     '<div class="qq-progress-bar"></div>' +
+                     '<span class="qq-upload-spinner"></span>' +
+                     '<span class="qq-upload-finished"></span>' +    
+                     '<span class="qq-upload-file"></span>' +
+                     '<span class="qqc-upload-size"></span>' +
+                         '<a class="qq-upload-cancel" href="#">{cancelButtonText}</a>' +
+                     '<a class="qq-upload-retry" href="#">{retryButtonText}</a>' +
+                     '<a class="qq-upload-delete" href="#">{deleteButtonText}</a>' +
+                 '<span class="qq-upload-status-text">{statusText}</span>' +
+                   '</li>',
+         
+         
+         classes: {
+           button: 'qqc-upload-button',
+           list: 'qqc-upload-list',
+           size: 'qqc-upload-size',
+           success: 'alert alert-success',
+           fail: 'alert alert-danger',
+         },
+         text : {
+           uploadButton: 'Bilder hochladen',
+         },
+         failedUploadTextDisplay: {
+           mode: 'custom',
+           maxChars: 40,
+           responseProperty: 'error',
+           enableTooltip: true
+         }
+       });
+     });
       

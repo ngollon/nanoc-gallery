@@ -26,8 +26,8 @@
                 %a{ :href => relative_path_to(parent) }= parent[:title]
           %li.active= item[:title]
           .pull-right 
-            - if item[:type] == 'album'            
-              %a{ :href => 'upload' } Hochladen
+            - if item[:type] == 'album' and rep.name != :upload
+              %a{ :href => 'upload/' } Hochladen
               %span.text-muted /
             - if item.identifier != '/'       
               %a{ :href => '#change_box', :data => { :toggle => 'modal' } } Passwort ändern
