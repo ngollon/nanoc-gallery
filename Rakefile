@@ -11,6 +11,18 @@ task :show_config do
   pp @config
 end
 
+
+desc "Updates everything if an update is required"
+task :update_everything do
+  trigger = File.join(@config['cache_directory'], '.updated')
+  if File.exists?(trigger) and File.mtime(trigger) + 5 * 60 < Time.now
+    Rake::Task['cache_all_images'].invoke
+    Rake::Task['update_all_albums'].invoke
+    `nanoc 2>&1 /dev/null`
+    File.unlink(trigger)
+  end
+end
+
 desc "Updates an album to contain the image links"
 task :update_album, [:id] do |t, args| 
   id = args[:id]
@@ -62,7 +74,6 @@ def update(image_directory, id)
   abort "File #{index_file} does not exist" unless File.exists?(index_file)
 
   if not Dir[id_directory + '/*/'].any?
-    puts "Updating album #{id}" if verbose == true
     update_album(id_directory, index_file)
   end
 end
@@ -86,7 +97,7 @@ def update_album(album_directory, index_file)
     YAML.dump(index, out)
   end
   total = index['images'].count
-  puts "Updated album #{album_directory}. Total: #{total}. New: #{total - old_count}" 
+  puts "Updated album #{album_directory}. Total: #{total}. New: #{total - old_count}" if verbose == true 
 end
 
 
@@ -124,13 +135,13 @@ def create(image, directory, size, mode)
   target = image.gsub(/^#{Regexp.escape(@config['image_directory'])}/, "#{cache}")
   dirname = File.dirname(target)
   if not Dir.exists?(dirname)
-    puts "Creating #{dirname}".green
+    puts "Creating #{dirname}".green if verbose == true
     FileUtils.mkdir_p(dirname)
   end
   if File.exists?(target) 
-    puts "Skipping #{target}".yellow
+    puts "Skipping #{target}".yellow if verbose == true
   else
-    puts "Creating #{target}".green
+    puts "Creating #{target}".green if verbose == true
     if mode == :crop
       convert_and_crop(image, target, size)
     else

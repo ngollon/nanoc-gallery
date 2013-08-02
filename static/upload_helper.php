@@ -31,10 +31,9 @@ if(!is_dir($target_folder))
 // Call handleUpload() with the name of the folder, relative to PHP's getcwd()
 $result = $uploader->handleUpload($target_folder);
 
-// To save the upload with a specified name, set the second parameter.
-// $result = $uploader->handleUpload('uploads/', md5(mt_rand()).'_'.$uploader->getName());
-
 // To return a name used for uploaded file you can use the following line.
 $result['uploadName'] = $uploader->getUploadName();
+
+touch('/srv/images/.updated');
 
 echo json_encode($result);
