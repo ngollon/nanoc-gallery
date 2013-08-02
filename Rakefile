@@ -16,10 +16,10 @@ desc "Updates everything if an update is required"
 task :update_everything do
   trigger = File.join(@config['cache_directory'], '.updated')
   if File.exists?(trigger) and File.mtime(trigger) + 5 * 60 < Time.now
+    File.unlink(trigger)
     Rake::Task['cache_all_images'].invoke
     Rake::Task['update_all_albums'].invoke
     `nanoc 2>&1 /dev/null`
-    File.unlink(trigger)
   end
 end
 
