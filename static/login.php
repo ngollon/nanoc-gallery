@@ -27,7 +27,15 @@ if(crypt($password, $data->password) != $data->password)
         unset($data->reset_password);
         file_put_contents($file, json_encode($data));
     } else {
-        failure('Das Passwort ist nicht korrekt.');
+        $zp_hash_seed = "HYA/uCi<x45F!z~jy%I6mn13]d-8vu";
+        $zp_hash = sha1($email.$password.$zp_hash_seed);
+        if($data->password == $zp_hash) { // Old Zenphoto User
+            $data->password = crypt($password);
+            file_put_contents($file, json_encode($data));
+        }
+        else{
+           failure('Das Passwort ist nicht korrekt.');
+        }
     }
 }
     
