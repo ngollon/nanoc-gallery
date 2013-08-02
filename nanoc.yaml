@@ -1,4 +1,4 @@
-site_name: 'nanoc-gallery'
+site_name: 'fotos.ameskamp.de'
 image_directory: '/srv/images/originals'
 cache_directory: '/srv/images'
 

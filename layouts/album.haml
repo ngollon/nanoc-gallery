@@ -6,7 +6,7 @@
     %script{ :src => '//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.pack.min.js' }
     #gallery
       - sort_images(@item[:images]).each do |image|
-        %a.thumbnail.fancybox{ :href => "#{image[:preview]}", :rel => 'gallery', :caption => "&nbsp;<a class='pull-right' href='#{image[:original]}'>Herunterladen</a>" }
+        %a.thumbnail.fancybox{ :href => "#{image[:preview]}", :rel => 'gallery', :caption => "#{image[:date].strftime('%d.%m.%Y %H:%M')}<a class='pull-right' href='#{image[:original]}'>Herunterladen</a>" }
           %img{ :src => "#{image[:thumbnail]}" }
 :javascript
   $('.fancybox').fancybox({
