@@ -1,10 +1,22 @@
 .row
-  .span12= yield
+  .col-lg-12= yield
 .row
-  .span12
+  .col-lg-12
+    %link{ :rel => 'stylesheet', :href => '//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.min.css', :type => 'text/css' }
+    %script{ :src => '//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.pack.min.js' }
     #gallery
       - sort_images(@item[:images]).each do |image|
-        %a.thumbnail{ :href => "#{image[:preview]}" }
+        %a.thumbnail.fancybox{ :href => "#{image[:preview]}", :rel => 'gallery', :caption => "&nbsp;<a class='pull-right' href='#{image[:original]}'>Herunterladen</a>" }
           %img{ :src => "#{image[:thumbnail]}" }
-%script
-  $('#gallery').photobox('a', { thumbs:true });
+:javascript
+  $('.fancybox').fancybox({
+    beforeLoad: function() {
+      this.title = $(this.element).attr('caption');
+    },
+    helpers: {
+      title: {
+        type: 'inside',
+      }
+    },
+  });
+
