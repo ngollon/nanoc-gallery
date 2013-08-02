@@ -15,7 +15,7 @@ if(!file_exists($file))
 $new_password = substr(str_shuffle('abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'), 0, 8);
 
 $message = "Hallo\n Dein neues Passwort ist " . $new_password;
-$header = "From: webmaster@fotos.ameskamp.de\r\nReply-To: jens@ameskamp.de";
+$header = "From: webmaster@ameskamp.de";
 mail($email, 'Neues Passwort', $message, $header);
 
 $data = json_decode(file_get_contents($file));

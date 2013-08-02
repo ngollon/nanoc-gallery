@@ -31,6 +31,12 @@ $data['email'] = $email;
 $data['password'] = crypt($password);
 file_put_contents($file, json_encode($data));
 
+
+$message = "Ein neuer Benutzer hat sich angemeldet.\r\nE-Mail: " . $email . "\r\nId: " . $id;
+$header = "From: webmaster@ameskamp.de";
+mail("jens@ameskamp.de", 'Neuer Benutzer', $message, $header);
+
+
 success('Registrierung erfolgreich. Wir werden Dich so bald wie möglich freischalten und Dir dann eine E-Mail schicken.');
 
 
