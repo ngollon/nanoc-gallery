@@ -3,7 +3,7 @@
 require_once 'auth.php';
 require_once 'json_helpers.php';
 
-$auth = Authoriization::$current;
+$auth = Authorization::$current;
 
 if(!isset($auth) || !$auth->loggedIn)
     failure('Du bist momentan nicht eingeloggt.');
@@ -14,7 +14,7 @@ if(!isset($_POST['old_password']) || !isset($_POST['new_password']))
 $oldPassword = $_POST['old_password'];
 $newPassword = $_POST['new_password'];
 
-if(!$auth->tryLoginWithPassword($old_password))
+if(!$auth->tryLoginWithPassword($oldPassword))
     failure("Das alte Passwort war nicht korrekt.");
 
 $auth->setPassword($newPassword);

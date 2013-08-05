@@ -5,23 +5,25 @@ class Authorization {
 
 	public function Authorization($id, $emailAsId = true) {
 		if($emailAsId) {
+            $this->email = $id;
 			$this->id = sha1(strtolower($id));
         } else {
 			$this->id = $id;
         }
 
-		$this->file = $_SERVER['DOCUMENT_ROOT'] . '/users/' . $id;
+		$this->file = $_SERVER['DOCUMENT_ROOT'] . '/../users/' . $this->id;
 
-		$this->exists = file_exists($file);
+		$this->exists = file_exists($this->file);
 
 		if($this->exists) {
-			$data = json_decode(file_get_contents($file));
+			$data = json_decode(file_get_contents($this->file));
 			$this->email = $data->email;
-			$this->passwordHash = $data->passwordHash;
-			if(isset($data->resetPassword))
-				$this->resetPassword = $data->resetPassword;
+            if(isset($data->password))
+    			$this->passwordHash = $data->password;
+			if(isset($data->reset_password))
+				$this->resetPasswordHash = $data->reset_password;
 			$this->active = $data->active;
-			$this->isZenphotoPassword = (strpos($this->password, '$') !== 0);
+			$this->isZenphotoPassword = (strpos($this->passwordHash, '$') !== 0);
 		}
 
 	}
@@ -30,56 +32,68 @@ class Authorization {
         if(!$this->exists)
         {
             $this->loggedIn = false;
-			
-        } elseif(crypt($password, $this->passwordHash) != $dthis->passwordHash) {
-            if(isset($this->resetPasswordHash) && crypt($password, $this->resetPasswordHash) == $this->resetPasswordHash) {
+            return false;			
+        }
+
+        $success = false;
+        if(isset($this->resetPasswordHash) && crypt($password, $this->resetPasswordHash) == $this->resetPasswordHash) {
                 $this->passwordHash = $this->resetPasswordHash;
                 unset($this->resetPasswordHash);
-                $this->loggedIn = true;
+                $success = true;
                 $this->save();
-            } else {
+        } elseif(isset($this->passwordHash)) {
+            if($this->isZenphotoPassword) {
                 $zp_hash_seed = "HYA/uCi<x45F!z~jy%I6mn13]d-8vu";
                 $zp_hash = sha1($this->email.$password.$zp_hash_seed);
-                if($this->password == $zp_hash) { // Old Zenphoto User
-                    $this->password = crypt($password);
-                    $this->loggedIn = true;
+                if($this->passwordHash == $zp_hash) { // Old Zenphoto User
+                    $this->passwordHash = crypt($password);
+                    $success = true;
                     $this->save();
-                } else {
-                    $this->loggedIn = false;
+                }
+            } else { 
+                $success = crypt($password, $this->passwordHash) == $this->passwordHash;
+                if(isset($this->resetPasswordHash)){
+                    unset($this->resetPasswordHash);
+                    $this->save();
                 }
             }
         }
-                
-        if($this->loggedIn) {
+
+        $this->loggedIn = $this->loggedIn || $success;    
+
+        if($success) {
             $this->password = $password;
-            
             $_SESSION['email'] = $this->email;
             $_SESSION['password'] = $password;            
         }
         
-        return $this->loggedIn;
+        return $success;
     }
 
 	public function tryLoginWithToken($token) {
+
         if(!$this->exists)
         {
-            $this->loggedIn = false;
-			
-        } elseif($token == sha1($this->id . $this->password)) {
-            $this->loggedIn = true;
+            $this->loggedIn = false;			
+            return false;
         }
+
+        $success = false;
+        if($token == sha1($this->id . $this->passwordHash)) {
+            $success = true;
+        }
+        
+        $this->loggedIn = $this->loggedIn || $success;    
          
-        return $this->loggedIn;
+        return $success;
 	}
 
 	public function save() {
         $data = array();
         $data['email'] = $this->email;
-        
-        if(!isset($this->passwordHash))
-            $this->passwordHash = crypt($this->password);
-        
-        $data['password'] = $this->passwordHash;
+       
+        if(isset($this->passwordHash))
+            $data['password'] = $this->passwordHash;
         if(isset($this->resetPasswordHash))
             $data['reset_password'] = $this->resetPasswordHash;
         $data['active'] = $this->active;

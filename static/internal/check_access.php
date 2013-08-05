@@ -7,7 +7,7 @@ if(isset($_GET['q'])) {
     header('Location: /index.html'); 
 }
 
-if(isset(Authorization::$current) && Authorization::$current->isLoggedIn) {
+if(isset(Authorization::$current) && Authorization::$current->loggedIn) {
     $mime = content_type($q);
     header('X-Accel-Redirect: /internal/' . $q);
     header('Content-Type: ' . $mime);
