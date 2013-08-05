@@ -1,6 +1,9 @@
 <?php
-  session_start();
-  session_destroy();
-  header('Location: /');
+require_once 'auth.php';
+
+if(isset(Authorization::$current))
+    Authorization::$current->logoff();
+
+header('Location: /');
 ?>
 

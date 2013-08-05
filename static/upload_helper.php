@@ -1,9 +1,14 @@
 <?php
 
+require_once 'auth.php';
+require_once 'json_helpers.php';
+
+if(!isset(Authorization::$current) || !Authorization::$current->isLoggedIn) {
+      exit(json_encode(array('error' => 'Uploads sind nur für angemeldete Benutzer möglich.')));
+}
+
 // Include the uploader class
 require_once 'qqFileUploader.php';
-
-header("Content-Type: application/json");
 
 $uploader = new qqFileUploader();
 

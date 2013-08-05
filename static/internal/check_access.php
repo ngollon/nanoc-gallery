@@ -1,17 +1,13 @@
 <?php
-session_start();
+require_once '../auth.php';
 
-if(isset($_GET['q']))
+if(isset($_GET['q'])) {
     $q = $_GET['q'];
-else
+} else {
     header('Location: /index.html'); 
-
-if(!isset($_SESSION['email']) || !isset($_SESSION['password']) || !try_login($_SESSION['email'], $_SESSION['password']))
-{
-    header('Location: /');
 }
-else
-{
+
+if(isset(Authorization::$current) && Authorization::$current->isLoggedIn) {
     $mime = content_type($q);
     header('X-Accel-Redirect: /internal/' . $q);
     header('Content-Type: ' . $mime);
@@ -19,6 +15,8 @@ else
         header("Expires: 31 December 2037 23:59:59 GMT");
         header('Cache-Control: max-age=315360000');
     }
+} else {
+    header('Location: /');     
 }
 
 function content_type($filename)
@@ -30,18 +28,4 @@ function content_type($filename)
         return 'text/html';
 }
 
-function try_login($email, $password)
-{
-    $id = sha1(strtolower($email));
-    $file = '../../users/' . $id;
-    if(!file_exists($file))
-        return false;
-
-    $data = json_decode(file_get_contents($file));
-    if(!$data->active)
-        return false;
-
-    if(crypt($password, $data->password) != $data->password)
-        return false;
-    return true;
-}
+?>
