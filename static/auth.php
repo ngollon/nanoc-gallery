@@ -107,7 +107,7 @@ class Authorization {
     
     public function persist() {
         setcookie("id", $this->id, time() + 365*24*60*60);
-        setcookie("token", sha1($this->id, $this->passwordHash), time() + 365*24*60*60);
+        setcookie("token", sha1($this->id . $this->passwordHash), time() + 365*24*60*60);
     }
     
     public function logoff() {

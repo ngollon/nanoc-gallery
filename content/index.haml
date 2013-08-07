@@ -20,6 +20,11 @@
       .form-group
         .col-lg-2
         .col-lg-10
+          .checkbox
+            %input.form-control{ :name => 'remember', :type => 'checkbox' } Angemeldet bleiben
+      .form-group
+        .col-lg-2
+        .col-lg-10
           %button.btn.btn-success{ :type => 'submit' } Einloggen
           %button#recover.btn.btn-link Passwort vergessen
   #create.tab-pane.fade

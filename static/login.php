@@ -20,7 +20,10 @@ $auth->tryLoginWithPassword($password);
 
 if(!$auth->loggedIn)   
     failure('Das Passwort ist nicht korrekt.');
-    
+
+if(isset($_POST['remember']))
+    $auth->persist();
+
 success('Dieser Text sollte nicht angezeigt wergen. Bitte aktiviere JavaScript.');
 
 ?>
