@@ -3,7 +3,7 @@
 require_once 'auth.php';
 require_once 'json_helpers.php';
 
-if(!isset(Authorization::$current) || !Authorization::$current->isLoggedIn) {
+if(!isset(Authorization::$current) || !Authorization::$current->loggedIn) {
       exit(json_encode(array('error' => 'Uploads sind nur für angemeldete Benutzer möglich.')));
 }
 
