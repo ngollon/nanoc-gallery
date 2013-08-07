@@ -4,7 +4,7 @@ require_once 'auth.php';
 require_once 'json_helpers.php';
 
 if(!isset(Authorization::$current) || !Authorization::$current->loggedIn) {
-      exit(json_encode(array('error' => 'Uploads sind nur für angemeldete Benutzer möglich.')));
+      exit(json_encode(array('error' => 'Upload verweigert. Melde Dich bitte an.')));
 }
 
 // Include the uploader class
