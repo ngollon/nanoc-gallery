@@ -1,6 +1,6 @@
 site_name: 'fotos.ameskamp.de'
-image_directory: '/srv/images/originals'
-cache_directory: '/srv/images'
+image_directory: '/srv/files/images'
+cache_directory: '/srv/files/images/_cache'
 
 # A list of file extensions that nanoc will consider to be textual rather than
 # binary. If an item with an extension not in this list is found,  the file

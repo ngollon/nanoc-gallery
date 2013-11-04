@@ -9,6 +9,7 @@ end
 
 
 def add_images_to_album(album)
+  return if album[:images].nil?
   album_images = album[:images].each { |i| add_image_properties(album, i) }
 
   album[:images] = album_images

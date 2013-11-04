@@ -3,8 +3,9 @@ require 'pp'
 require 'exifr'
 require 'colorize'
 require 'fileutils'
+require 'time'
 
-@config = YAML.load_file('/srv/nanoc-gallery/nanoc.yaml')
+@config = YAML.load_file('/usr/share/webapps/nanoc-gallery/nanoc.yaml')
 
 desc "Shows current site config"
 task :show_config do
@@ -15,12 +16,12 @@ end
 desc "Updates everything if an update is required"
 task :update_everything do
   trigger = File.join(@config['cache_directory'], '.updated')
-  if File.exists?(trigger) and File.mtime(trigger) + 5 * 60 < Time.now
-    File.unlink(trigger)
+#  if File.exists?(trigger) and File.mtime(trigger) + 5 * 60 < Time.now
+#    File.unlink(trigger)
     Rake::Task['cache_all_images'].invoke
     Rake::Task['update_all_albums'].invoke
     `nanoc 2>&1 /dev/null`
-  end
+#  end
 end
 
 desc "Updates an album to contain the image links"
@@ -39,10 +40,12 @@ task :update_all_albums do
   update(image_directory, '/' )
 
   Dir.glob(image_directory + '/**/*/').each do |dir|
-    l1 = image_directory.length
-    l2 = dir.length - l1
-    id = dir[l1, l2]
-    update(image_directory, id) 
+    if not dir.start_with?(@config['cache_directory']) then
+      l1 = image_directory.length
+      l2 = dir.length - l1
+      id = dir[l1, l2]
+      update(image_directory, id) 
+    end
   end
 end
 
@@ -58,8 +61,8 @@ end
 
 desc "Create thumbnails and previews for all images"
 task :cache_all_images do
-  images = Dir[@config['image_directory'] + '/**/*'].reject {|fn| File.directory?(fn) }
-  images.each do |i|
+  images = Dir[@config['image_directory'] + '/**/*'].reject { |fn| fn.start_with?(@config['cache_directory']) }.reject {|fn| File.directory?(fn) }
+  images.each do |i|      
     create_thumbnail(i)
     create_preview(i)
   end
@@ -91,6 +94,8 @@ def update_album(album_directory, index_file)
     new_image['date'] = get_date(File.join(album_directory, new_image['id']))
     index['images'] << new_image
   end
+
+  index['images'].each { |i| i['date'] = Time.parse(i['date']) if i['date'].is_a? String }
 
   index['images'].sort! { |a,b| a['date'] <=> b['date'] }
   File.open(index_file, 'w+') do |out|

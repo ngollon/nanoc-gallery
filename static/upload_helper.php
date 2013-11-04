@@ -28,7 +28,7 @@ $uploader->chunksFolder = '/tmp';
 if(!isset($_POST['album']))
     exit(json_encode(array('error' => 'Kein Album angegeben.')));
 
-$target_folder = '/srv/images/originals/' . $_POST['album'];
+$target_folder = '/srv/files/images/' . $_POST['album'];
 
 if(!is_dir($target_folder))
     exit(json_encode(array('error' => 'Das Albumverzeichnis '.$target_folder.' wurde nicht gefunden.')));
@@ -39,6 +39,6 @@ $result = $uploader->handleUpload($target_folder);
 // To return a name used for uploaded file you can use the following line.
 $result['uploadName'] = $uploader->getUploadName();
 
-touch('/srv/images/.updated');
+touch('/srv/files/images/.updated');
 
 echo json_encode($result);

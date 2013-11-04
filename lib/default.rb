@@ -1,6 +1,10 @@
 # All files in the 'lib' directory will be loaded
 # before nanoc starts compiling.
 
+require 'rubygems'
+require 'bundler/setup'
+
+
 def link_to(text, target, attributes={})
   # Find path
   if target.is_a?(String)

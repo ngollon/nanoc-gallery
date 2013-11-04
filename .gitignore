@@ -1,5 +1,8 @@
 crash.log
-Gemfile.lock
+
+.gems/
+.bundle/
+bin/
 
 users/
 
